@@ -20,7 +20,7 @@ export class NiktoService {
     this.tuning = '123489abc';
     this.maxTime = 30;
     this._targetUrl = '';
-    this.outputFormat = 'xml';
+    this.outputFormat = '.xml';
     this.reportDirectory = path.resolve(__dirname, '..', '..', 'reports');
   }
 
@@ -56,9 +56,9 @@ export class NiktoService {
     process.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
-    // process.stdout.on('data', (data) => {
-    //   console.log(`stdout: ${data}`);
-    // });
+    process.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+     });
     process.on('close', async (code) => {
       if (code !== 0) {
         console.log(`nikto process exited with code ${code}`);
