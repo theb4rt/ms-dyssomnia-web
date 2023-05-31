@@ -14,14 +14,22 @@ export class NiktoService {
   private maxTime: number;
   private outputFormat: string;
   private reportDirectory: string;
+  private configFile: string;
 
   constructor(private readonly xmlToJson: XmlToJson) {
     this.timeout = 3;
     this.tuning = '123489abc';
     this.maxTime = 30;
     this._targetUrl = '';
-    this.outputFormat = '.xml';
+    this.outputFormat = 'xml';
     this.reportDirectory = path.resolve(__dirname, '..', '..', 'reports');
+    this.configFile = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'config_files',
+      'nikto.conf',
+    );
   }
 
   get targetUrl(): string {
@@ -35,7 +43,9 @@ export class NiktoService {
     const command = 'nikto';
     const nameFileOutput =
       this.targetUrl.replace(/(^\w+:|^)\/\//, '') +
+      '-' +
       this.getCurrentDate() +
+      '.' +
       this.outputFormat;
     const args = [
       '-h',
@@ -43,22 +53,25 @@ export class NiktoService {
       '-Tuning',
       this.tuning,
       '-timeout',
-      this.timeout.toString(),
-      '-maxtime',
+      // this.timeout.toString(),
+      // '-maxtime',
       this.maxTime.toString(),
       '-Format',
       this.outputFormat,
       '-o',
       path.resolve(this.reportDirectory, nameFileOutput),
+      '-config',
+      this.configFile,
     ];
 
     const process = spawn(command, args);
+    console.log('Nikto scan started for ' + this.targetUrl);
     process.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
-    process.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-     });
+    // process.stdout.on('data', (data) => {
+    //   console.log(`stdout: ${data}`);
+    // });
     process.on('close', async (code) => {
       if (code !== 0) {
         console.log(`nikto process exited with code ${code}`);
@@ -66,7 +79,7 @@ export class NiktoService {
       const xmlFilePath = path.resolve(this.reportDirectory, nameFileOutput);
       try {
         const jsonData = await this.xmlToJson.convert(xmlFilePath);
-        console.log(jsonData);
+        console.log(JSON.stringify(jsonData, null, 2));
       } catch (error) {
         console.error('Error converting XML to JSON:', error);
       }

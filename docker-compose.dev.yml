@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  ms-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "4000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
