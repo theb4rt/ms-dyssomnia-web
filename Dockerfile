@@ -1,4 +1,5 @@
 FROM node:18-alpine3.17
+USER node
 
 RUN apk update && apk add --no-cache nikto perl-net-ssleay
 

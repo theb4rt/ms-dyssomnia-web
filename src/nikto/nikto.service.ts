@@ -3,6 +3,8 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 import * as moment from 'moment';
 import { XmlToJson } from './nikto';
+import configuration from '../config/configuration';
+import { HttpService } from '../services/httpService';
 
 @Injectable()
 export class NiktoService {
@@ -15,11 +17,12 @@ export class NiktoService {
   private outputFormat: string;
   private reportDirectory: string;
   private configFile: string;
+  private httpService: HttpService;
 
   constructor(private readonly xmlToJson: XmlToJson) {
     this.timeout = 3;
     this.tuning = '123489abc';
-    this._maxTime = 30;
+    this._maxTime = 300;
     this._targetUrl = '';
     this.outputFormat = 'xml';
     this.reportDirectory = path.resolve(__dirname, '..', '..', 'reports');
@@ -30,6 +33,7 @@ export class NiktoService {
       'config_files',
       'nikto.conf',
     );
+    this.httpService = new HttpService();
   }
 
   get targetUrl(): string {
@@ -78,17 +82,25 @@ export class NiktoService {
     process.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
-    process.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
+    // process.stdout.on('data', (data) => {
+    //   console.log(`stdout: ${data}`);
+    // });
     process.on('close', async (code) => {
       if (code !== 0) {
         console.log(`nikto process exited with code ${code}`);
       }
       const xmlFilePath = path.resolve(this.reportDirectory, nameFileOutput);
       try {
-        const jsonData = await this.xmlToJson.convert(xmlFilePath);
-        console.log(JSON.stringify(jsonData, null, 2));
+        const dataFromXml = await this.xmlToJson.convert(xmlFilePath);
+        dataFromXml.host = this.targetUrl;
+        // const jsonData = JSON.stringify(dataFromXml, null, 2);
+        // console.log(JSON.stringify(jsonData, null, 2));
+        //console.log(jsonData);
+        console.log('Sending data to the endpoint...');
+        const endpointUrl = configuration().dyssomniaApiUrl + 'web/nikto';
+        console.log('Endpoint URL:', endpointUrl);
+
+        await this.httpService.post(endpointUrl, dataFromXml);
       } catch (error) {
         console.error('Error converting XML to JSON:', error);
       }
