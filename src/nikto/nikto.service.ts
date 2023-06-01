@@ -11,7 +11,7 @@ export class NiktoService {
   private data: object;
   private tuning: string;
   private _targetUrl: string;
-  private maxTime: number;
+  private _maxTime?: number;
   private outputFormat: string;
   private reportDirectory: string;
   private configFile: string;
@@ -19,7 +19,7 @@ export class NiktoService {
   constructor(private readonly xmlToJson: XmlToJson) {
     this.timeout = 3;
     this.tuning = '123489abc';
-    this.maxTime = 30;
+    this._maxTime = 30;
     this._targetUrl = '';
     this.outputFormat = 'xml';
     this.reportDirectory = path.resolve(__dirname, '..', '..', 'reports');
@@ -39,8 +39,18 @@ export class NiktoService {
   set targetUrl(value: string) {
     this._targetUrl = value;
   }
+
+  get maxTime(): number {
+    return this._maxTime;
+  }
+
+  set maxTime(value: number) {
+    this._maxTime = value;
+  }
+
   async runNikto(): Promise<string> {
     const command = 'nikto';
+    this.configureMaxTime();
     const nameFileOutput =
       this.targetUrl.replace(/(^\w+:|^)\/\//, '') +
       '-' +
@@ -53,15 +63,14 @@ export class NiktoService {
       '-Tuning',
       this.tuning,
       '-timeout',
-      // this.timeout.toString(),
-      // '-maxtime',
-      this.maxTime.toString(),
+      this.timeout.toString(),
       '-Format',
       this.outputFormat,
       '-o',
       path.resolve(this.reportDirectory, nameFileOutput),
       '-config',
       this.configFile,
+      ...(this._maxTime === null ? [] : ['-maxtime', this._maxTime.toString()]),
     ];
 
     const process = spawn(command, args);
@@ -69,9 +78,9 @@ export class NiktoService {
     process.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
     });
-    // process.stdout.on('data', (data) => {
-    //   console.log(`stdout: ${data}`);
-    // });
+    process.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
     process.on('close', async (code) => {
       if (code !== 0) {
         console.log(`nikto process exited with code ${code}`);
@@ -91,4 +100,12 @@ export class NiktoService {
   getCurrentDate(): string {
     return moment().format('YYYY-MM-DD-HH-mm-ss');
   }
+
+  configureMaxTime = () => {
+    if (this._maxTime === undefined) {
+      this.maxTime = 10;
+    } else if (this._maxTime === -1) {
+      this.maxTime = null;
+    }
+  };
 }

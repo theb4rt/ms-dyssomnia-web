@@ -8,8 +8,10 @@ export class NiktoController {
 
   @Post()
   async runNikto(@Body() data: NiktoDTO) {
-    const { host } = data;
+    const { host, max_time } = data;
+
     this.niktoService.targetUrl = host;
+    this.niktoService.maxTime = max_time;
     const result = await this.niktoService.runNikto();
     return result;
   }
