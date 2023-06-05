@@ -17,9 +17,11 @@ export class NiktoService {
   private outputFormat: string;
   private reportDirectory: string;
   private configFile: string;
-  private httpService: HttpService;
 
-  constructor(private readonly xmlToJson: XmlToJson) {
+  constructor(
+    private readonly xmlToJson: XmlToJson,
+    private readonly httpService: HttpService,
+  ) {
     this.timeout = 3;
     this.tuning = '123489abc';
     this._maxTime = 300;
@@ -33,7 +35,6 @@ export class NiktoService {
       'config_files',
       'nikto.conf',
     );
-    this.httpService = new HttpService();
   }
 
   get targetUrl(): string {

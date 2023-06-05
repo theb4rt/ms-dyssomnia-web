@@ -1,10 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { NiktoService } from './nikto.service';
-import { Nikto, XmlToJson } from './nikto';
+import { XmlToJson } from './nikto';
 import { NiktoController } from './nikto.controller';
+import { HttpService } from '../services/httpService';
+import { RoutePrefixingMiddleware } from '../route-prefixing';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  providers: [NiktoService, Nikto, XmlToJson],
+  imports: [ConfigModule],
+  providers: [NiktoService, XmlToJson, HttpService],
   controllers: [NiktoController],
 })
-export class NiktoModule {}
+export class NiktoModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(RoutePrefixingMiddleware).forRoutes(NiktoController);
+  // }
+}
