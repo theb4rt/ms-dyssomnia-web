@@ -1,12 +1,14 @@
-export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3001,
-  dyssomniaApiUrl: process.env.DYSSOMNIA_API_URL,
+import { ConfigService } from '@nestjs/config';
+
+export default (configService: ConfigService) => ({
+  port: configService.get<number>('PORT', 3001),
+  dyssomniaApiUrl: configService.get<string>('DYSSOMNIA_API_URL'),
   database: {
-    host: process.env.DATABASE_HOST,
-    port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
+    host: configService.get<string>('DATABASE_HOST'),
+    port: configService.get<number>('DATABASE_PORT', 5432),
   },
   api: {
-    version: process.env.API_VERSION || 'v1',
-    prefix: process.env.API_PREFIX || 'api',
+    version: configService.get<string>('API_VERSION', 'v1'),
+    prefix: configService.get<string>('API_PREFIX', 'api'),
   },
 });

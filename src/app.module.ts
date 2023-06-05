@@ -6,14 +6,13 @@ import { WebBusterService } from './web-buster/web-buster.service';
 import { WebBuster } from './web-buster/web-buster';
 import { WebBusterModule } from './web-buster/web-buster.module';
 import { ConfigModule } from '@nestjs/config';
-import configuration from './config/configuration';
 
 @Module({
   imports: [
     NiktoModule,
     WebBusterModule,
     ConfigModule.forRoot({
-      load: [configuration],
+      envFilePath: ['.env', `.env.${process.env.NODE_ENV}`],
     }),
   ],
   controllers: [AppController],

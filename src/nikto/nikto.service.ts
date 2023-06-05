@@ -3,8 +3,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 import * as moment from 'moment';
 import { XmlToJson } from './nikto';
-import configuration from '../config/configuration';
-import { HttpService } from '../services/httpService';
+import { WebhookService } from '../services/webhook.service';
 
 @Injectable()
 export class NiktoService {
@@ -20,7 +19,7 @@ export class NiktoService {
 
   constructor(
     private readonly xmlToJson: XmlToJson,
-    private readonly httpService: HttpService,
+    private readonly webhookService: WebhookService,
   ) {
     this.timeout = 3;
     this.tuning = '123489abc';
@@ -94,14 +93,9 @@ export class NiktoService {
       try {
         const dataFromXml = await this.xmlToJson.convert(xmlFilePath);
         dataFromXml.host = this.targetUrl;
-        // const jsonData = JSON.stringify(dataFromXml, null, 2);
-        // console.log(JSON.stringify(jsonData, null, 2));
-        //console.log(jsonData);
-        console.log('Sending data to the endpoint...');
-        const endpointUrl = configuration().dyssomniaApiUrl + 'web/nikto';
-        console.log('Endpoint URL:', endpointUrl);
-
-        await this.httpService.post(endpointUrl, dataFromXml);
+        // dataFromXml.user_id = '';
+        console.log('Sending data to the webhook');
+        await this.webhookService.sendWebhookNikto('web/nikto', dataFromXml);
       } catch (error) {
         console.error('Error converting XML to JSON:', error);
       }

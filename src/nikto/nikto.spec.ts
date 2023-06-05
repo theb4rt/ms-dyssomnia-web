@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Nikto } from './nikto';
+import { XmlToJson } from './nikto';
 
 describe('Nikto', () => {
-  let provider: Nikto;
+  let provider: XmlToJson;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [Nikto],
+      providers: [XmlToJson],
     }).compile();
 
-    provider = module.get<Nikto>(Nikto);
+    provider = module.get<XmlToJson>(XmlToJson);
   });
 
   it('should be defined', () => {
