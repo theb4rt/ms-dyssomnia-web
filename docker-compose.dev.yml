@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  ms-web:
+  ms-dyssomnia-web:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -12,3 +12,11 @@ services:
     environment:
       NODE_ENV: development
       PORT: 4000
+    networks:
+      - dyssomnia-network
+    deploy:
+      replicas: 1
+
+networks:
+  dyssomnia-network:
+    external: true

@@ -7,7 +7,6 @@ export class RoutePrefixingMiddleware implements NestMiddleware {
   constructor(private configService: ConfigService) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-
     const apiPrefix = this.configService.get<string>('api.prefix');
     const apiVersion = this.configService.get<string>('api.version');
 
