@@ -16,6 +16,7 @@ export class NiktoService {
   private outputFormat: string;
   private reportDirectory: string;
   private configFile: string;
+  private _userId: string;
 
   constructor(
     private readonly xmlToJson: XmlToJson,
@@ -26,6 +27,7 @@ export class NiktoService {
     this._maxTime = 300;
     this._targetUrl = '';
     this.outputFormat = 'xml';
+    this._userId = '';
     this.reportDirectory = path.resolve(__dirname, '..', '..', 'reports');
     this.configFile = path.resolve(
       __dirname,
@@ -52,11 +54,19 @@ export class NiktoService {
     this._maxTime = value;
   }
 
+  get userId(): string {
+    return this._userId;
+  }
+
+  set userId(value: string) {
+    this._userId = value;
+  }
+
   async runNikto(): Promise<string> {
     const command = 'nikto';
     this.configureMaxTime();
     const nameFileOutput =
-      this.targetUrl.replace(/(^\w+:|^)\/\//, '') +
+      this.targetUrl.replace(/(^\w+:|^)\/\//, '').replace(/\/$/, '') +
       '-' +
       this.getCurrentDate() +
       '.' +
@@ -93,7 +103,7 @@ export class NiktoService {
       try {
         const dataFromXml = await this.xmlToJson.convert(xmlFilePath);
         dataFromXml.host = this.targetUrl;
-        // dataFromXml.user_id = '';
+        dataFromXml.user_id = this.userId;
         console.log('Sending data to the webhook');
         await this.webhookService.sendWebhookNikto('web/nikto', dataFromXml);
       } catch (error) {
