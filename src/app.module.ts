@@ -6,6 +6,7 @@ import { WebBusterService } from './web-buster/web-buster.service';
 import { WebBuster } from './web-buster/web-buster';
 import { WebBusterModule } from './web-buster/web-buster.module';
 import { ConfigModule } from '@nestjs/config';
+import { JwtStrategy } from './auth/strategy';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { ConfigModule } from '@nestjs/config';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, WebBusterService, WebBuster],
+  providers: [AppService, WebBusterService, WebBuster, JwtStrategy],
 })
 export class AppModule {}
