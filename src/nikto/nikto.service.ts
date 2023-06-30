@@ -62,7 +62,7 @@ export class NiktoService {
     this._userId = value;
   }
 
-  async runNikto(): Promise<string> {
+  async runNikto(): Promise<boolean> {
     const command = 'nikto';
     this.configureMaxTime();
     const nameFileOutput =
@@ -111,7 +111,7 @@ export class NiktoService {
       }
     });
 
-    return 'Nikto scan started.';
+    return true;
   }
 
   getCurrentDate(): string {

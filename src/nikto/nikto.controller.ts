@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { NiktoService } from './nikto.service';
 import { NiktoDTO } from './nikto.dto';
 import { JwtAuthGuard } from '../auth/jwt-guard';
@@ -9,13 +16,18 @@ export class NiktoController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
   async runNikto(@Body() data: NiktoDTO, @Req() req) {
     const { host, max_time } = data;
+
     this.niktoService.targetUrl = host;
     this.niktoService.maxTime = max_time;
     this.niktoService.userId = req.user.sub;
 
     const result = await this.niktoService.runNikto();
-    return result;
+
+    return {
+      message: 'Nikto scan launched',
+    };
   }
 }

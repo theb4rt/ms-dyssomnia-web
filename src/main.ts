@@ -9,6 +9,8 @@ async function bootstrap() {
   const apiPrefix = configService.get<string>('API_PREFIX');
   const apiVersion = configService.get<string>('API_VERSION');
   app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+  // Enable CORS
+  app.enableCors();
   await app.listen(port);
 }
 bootstrap();
