@@ -3,7 +3,7 @@ RUN apk update && apk add --no-cache nikto perl-net-ssleay
 # Create symlink for nikto
 RUN ln -s /usr/bin/nikto.pl /usr/bin/nikto
 
-USER node
+#USER node
 WORKDIR /app
 
 COPY package.json yarn.lock ./
@@ -12,6 +12,8 @@ COPY package.json yarn.lock ./
 RUN yarn install --production=false
 
 COPY . .
+
+#USER node
 
 EXPOSE 4000
 
